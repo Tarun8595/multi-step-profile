@@ -5,7 +5,7 @@ register = template.Library()
 @register.filter
 def profile_completion(profile):
     """Calculate profile completion percentage"""
-    total_fields = 10
+    total_fields = 8
     completed_fields = 0
     
     # Check each field
