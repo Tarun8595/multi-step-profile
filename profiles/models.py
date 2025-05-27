@@ -25,7 +25,18 @@ class UserProfile(models.Model):
     ]
     
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    profile_picture = models.ImageField(upload_to=user_profile_image_path, blank=False, null=False)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    
+    def delete_old_profile_picture(self):
+        """
+        Deletes old profile picture from the filesystem if it exists.
+        """
+        try:
+            if self.profile_picture:
+                if os.path.isfile(self.profile_picture.path):
+                    os.remove(self.profile_picture.path)
+        except Exception as e:
+            print(f"Error deleting old profile picture: {e}")
     
     # Personal Details
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True)
