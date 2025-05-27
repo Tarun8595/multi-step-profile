@@ -111,3 +111,8 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 2 * 1024 * 1024  # 2MB
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'profile_update'
 LOGOUT_REDIRECT_URL = 'home'
+
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://multi-step-profile-lmc7.onrender.com',
+]
