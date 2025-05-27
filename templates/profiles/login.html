@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Multi-Step Profile Update{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-sign-in-alt"></i> Welcome Back
+                </h4>
+                <p class="mb-0 mt-2" style="opacity: 0.9;">Sign in to your account</p>
+            </div>
+            <div class="card-body">
+                <form method="post" id="login-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username" required 
+                               placeholder="Enter your username" autocomplete="username">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="position-relative">
+                            <input type="password" class="form-control" id="password" name="password" required 
+                                   placeholder="Enter your password" autocomplete="current-password">
+                            <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y" 
+                                    id="toggle-password" style="border: none; background: none; color: var(--text-muted);">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="mb-0">Don't have an account? 
+                        <a href="{% url 'register' %}" class="text-decoration-none fw-bold">
+                            Register here <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Toggle password visibility
+    $('#toggle-password').on('click', function() {
+        const passwordField = $('#password');
+        const icon = $(this).find('i');
+        
+        if (passwordField.attr('type') === 'password') {
+            passwordField.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            passwordField.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+
+    // Form validation
+    $('#login-form').on('submit', function(e) {
+        const username = $('#username').val().trim();
+        const password = $('#password').val();
+        
+        if (!username || !password) {
+            e.preventDefault();
+            alert('Please fill in all fields!');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

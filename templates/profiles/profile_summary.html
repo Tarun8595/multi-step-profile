@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile Summary{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step completed">
+                <div class="step-number"><i class="fas fa-check"></i></div>
+                <span>Personal Info</span>
+            </div>
+            <div class="step completed">
+                <div class="step-number"><i class="fas fa-check"></i></div>
+                <span>Professional</span>
+            </div>
+            <div class="step completed">
+                <div class="step-number"><i class="fas fa-check"></i></div>
+                <span>Preferences</span>
+            </div>
+            <div class="step active">
+                <div class="step-number">4</div>
+                <span>Summary</span>
+            </div>
+        </div>
+
+        <!-- Summary Content -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-clipboard-check"></i> Profile Summary
+                </h4>
+                <small style="opacity: 0.9;">Please review your information before submitting</small>
+            </div>
+            <div class="card-body">
+                <!-- Personal Information -->
+                <div class="summary-section">
+                    <h5><i class="fas fa-user text-primary"></i> Personal Information</h5>
+                    <div class="summary-item">
+                        <span class="summary-label">Username:</span>
+                        <span class="summary-value">{{ summary.step1.username }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Gender:</span>
+                        <span class="summary-value">
+                            {% if summary.step1.gender == 'other' %}
+                                {{ summary.step1.custom_gender }}
+                            {% else %}
+                                {{ summary.step1.gender|title }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% if summary.step1.new_password %}
+                        <div class="summary-item">
+                            <span class="summary-label">Password:</span>
+                            <span class="summary-value text-success">
+                                <i class="fas fa-check"></i> Password will be updated
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Professional Details -->
+                <div class="summary-section">
+                    <h5><i class="fas fa-briefcase text-success"></i> Professional Details</h5>
+                    <div class="summary-item">
+                        <span class="summary-label">Profession:</span>
+                        <span class="summary-value">{{ summary.step2.profession|title }}</span>
+                    </div>
+                    {% if summary.step2.company_name %}
+                        <div class="summary-item">
+                            <span class="summary-label">Company Name:</span>
+                            <span class="summary-value">{{ summary.step2.company_name }}</span>
+                        </div>
+                    {% endif %}
+                    <div class="summary-item">
+                        <span class="summary-label">Address:</span>
+                        <span class="summary-value">
+                            {{ summary.step2.address_line1 }}
+                            {% if summary.step2.address_line2 %}
+                                <br>{{ summary.step2.address_line2 }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Preferences -->
+                <div class="summary-section">
+                    <h5><i class="fas fa-cog text-info"></i> Preferences</h5>
+                    <div class="summary-item">
+                        <span class="summary-label">Location:</span>
+                        <span class="summary-value">
+                            {{ summary.city.name }}, {{ summary.state.name }}, {{ summary.country.name }}
+                        </span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Subscription Plan:</span>
+                        <span class="summary-value">{{ summary.step3.subscription_plan|title }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Newsletter:</span>
+                        <span class="summary-value">
+                            {% if summary.step3.newsletter %}
+                                <i class="fas fa-check text-success"></i> Subscribed
+                            {% else %}
+                                <i class="fas fa-times text-danger"></i> Not subscribed
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% if summary.step3.date_of_birth %}
+                        <div class="summary-item">
+                            <span class="summary-label">Date of Birth:</span>
+                            <span class="summary-value">{{ summary.step3.date_of_birth|date:"F d, Y" }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'profile_update' %}" class="btn btn-secondary">
+                        <i class="fas fa-edit"></i> Edit Information
+                    </a>
+                    
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save"></i> Save Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

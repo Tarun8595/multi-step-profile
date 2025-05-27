@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Profile - Step {{ current_step }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step {% if current_step >= 1 %}{% if current_step == 1 %}active{% else %}completed{% endif %}{% else %}inactive{% endif %}">
+                <div class="step-number">1</div>
+                <span>Personal Info</span>
+            </div>
+            <div class="step {% if current_step >= 2 %}{% if current_step == 2 %}active{% else %}completed{% endif %}{% else %}inactive{% endif %}">
+                <div class="step-number">2</div>
+                <span>Professional</span>
+            </div>
+            <div class="step {% if current_step >= 3 %}{% if current_step == 3 %}active{% else %}completed{% endif %}{% else %}inactive{% endif %}">
+                <div class="step-number">3</div>
+                <span>Preferences</span>
+            </div>
+            <div class="step {% if current_step >= 4 %}{% if current_step == 4 %}active{% else %}completed{% endif %}{% else %}inactive{% endif %}">
+                <div class="step-number">4</div>
+                <span>Summary</span>
+            </div>
+        </div>
+
+        <!-- Form Content -->
+        <div class="form-section">
+            <form method="post" enctype="multipart/form-data" id="profile-form">
+                {% csrf_token %}
+                
+                {% if current_step == 1 %}
+                    <h3>
+                        <i class="fas fa-user"></i> Personal Information
+                    </h3>
+                    
+                    <!-- Profile Picture -->
+                    <div class="form-group">
+                        <label for="{{ form.profile_picture.id_for_label }}" class="form-label">
+                            <i class="fas fa-camera"></i> Profile Picture <span class="required">*</span>
+                        </label>
+                        {{ form.profile_picture }}
+                        <div class="form-text">{{ form.profile_picture.help_text }}</div>
+                        {% if profile.profile_picture %}
+                            <div class="mt-2">
+                                <img src="{{ profile.profile_picture.url }}" alt="Current profile" class="preview-image">
+                                <div class="form-text">Current profile picture</div>
+                            </div>
+                        {% endif %}
+                        <div id="image-preview"></div>
+                        {% if form.profile_picture.errors %}
+                            <div class="invalid-feedback d-block">{{ form.profile_picture.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Username -->
+                    <div class="form-group">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">
+                            <i class="fas fa-at"></i> Username <span class="required">*</span>
+                        </label>
+                        {{ form.username }}
+                        <div class="form-text">4-20 characters, no spaces allowed</div>
+                        <div id="username-feedback" class="username-feedback"></div>
+                        {% if form.username.errors %}
+                            <div class="invalid-feedback d-block">{{ form.username.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Gender -->
+                    <div class="form-group">
+                        <label for="{{ form.gender.id_for_label }}" class="form-label">
+                            <i class="fas fa-venus-mars"></i> Gender <span class="required">*</span>
+                        </label>
+                        {{ form.gender }}
+                        {{ form.custom_gender }}
+                        {% if form.gender.errors %}
+                            <div class="invalid-feedback d-block">{{ form.gender.errors.0 }}</div>
+                        {% endif %}
+                        {% if form.custom_gender.errors %}
+                            <div class="invalid-feedback d-block">{{ form.custom_gender.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Password Section -->
+                    <div class="form-group">
+                        <h5><i class="fas fa-lock"></i> Password Update (Optional)</h5>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.current_password.id_for_label }}" class="form-label">Current Password</label>
+                            {{ form.current_password }}
+                            <div class="form-text">Required only if you want to change your password</div>
+                            {% if form.current_password.errors %}
+                                <div class="invalid-feedback d-block">{{ form.current_password.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.new_password.id_for_label }}" class="form-label">New Password</label>
+                            {{ form.new_password }}
+                            <div id="password-strength" class="password-strength"></div>
+                            <div id="password-feedback" class="form-text"></div>
+                            {% if form.new_password.errors %}
+                                <div class="invalid-feedback d-block">{{ form.new_password.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.confirm_password.id_for_label }}" class="form-label">Confirm New Password</label>
+                            {{ form.confirm_password }}
+                            {% if form.confirm_password.errors %}
+                                <div class="invalid-feedback d-block">{{ form.confirm_password.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                
+                {% elif current_step == 2 %}
+                    <h3>
+                        <i class="fas fa-briefcase"></i> Professional Details
+                    </h3>
+                    
+                    <!-- Profession -->
+                    <div class="form-group">
+                        <label for="{{ form.profession.id_for_label }}" class="form-label">
+                            <i class="fas fa-user-tie"></i> Profession <span class="required">*</span>
+                        </label>
+                        {{ form.profession }}
+                        {% if form.profession.errors %}
+                            <div class="invalid-feedback d-block">{{ form.profession.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Company Name (shown only for Entrepreneur) -->
+                    <div id="company-details" class="company-details form-group">
+                        <label for="{{ form.company_name.id_for_label }}" class="form-label">
+                            <i class="fas fa-building"></i> Company Name <span class="required">*</span>
+                        </label>
+                        {{ form.company_name }}
+                        <div class="form-text">Required for entrepreneurs</div>
+                        {% if form.company_name.errors %}
+                            <div class="invalid-feedback d-block">{{ form.company_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Address -->
+                    <div class="form-group">
+                        <label for="{{ form.address_line1.id_for_label }}" class="form-label">
+                            <i class="fas fa-home"></i> Address Line 1 <span class="required">*</span>
+                        </label>
+                        {{ form.address_line1 }}
+                        {% if form.address_line1.errors %}
+                            <div class="invalid-feedback d-block">{{ form.address_line1.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                
+                {% elif current_step == 3 %}
+                    <h3>
+                        <i class="fas fa-cog"></i> Preferences
+                    </h3>
+                    
+                    <!-- Location -->
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            <label for="{{ form.country.id_for_label }}" class="form-label">
+                                <i class="fas fa-globe"></i> Country <span class="required">*</span>
+                            </label>
+                            {{ form.country }}
+                            {% if form.country.errors %}
+                                <div class="invalid-feedback d-block">{{ form.country.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 form-group">
+                            <label for="{{ form.state.id_for_label }}" class="form-label">
+                                <i class="fas fa-map"></i> State <span class="required">*</span>
+                            </label>
+                            {{ form.state }}
+                            {% if form.state.errors %}
+                                <div class="invalid-feedback d-block">{{ form.state.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 form-group">
+                            <label for="{{ form.city.id_for_label }}" class="form-label">
+                                <i class="fas fa-city"></i> City <span class="required">*</span>
+                            </label>
+                            {{ form.city }}
+                            {% if form.city.errors %}
+                                <div class="invalid-feedback d-block">{{ form.city.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Subscription Plan -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-crown"></i> Subscription Plan <span class="required">*</span>
+                        </label>
+                        <div class="mt-2">
+                            {% for choice in form.subscription_plan %}
+                                <div class="form-check">
+                                    {{ choice.tag }}
+                                    <label class="form-check-label" for="{{ choice.id_for_label }}">
+                                        {{ choice.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.subscription_plan.errors %}
+                            <div class="invalid-feedback d-block">{{ form.subscription_plan.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Newsletter -->
+                    <div class="form-group">
+                        <div class="form-check">
+                            {{ form.newsletter }}
+                            <label class="form-check-label" for="{{ form.newsletter.id_for_label }}">
+                                <i class="fas fa-envelope"></i> Subscribe to Newsletter
+                            </label>
+                        </div>
+                        <div class="form-text">Stay updated with our latest news and updates</div>
+                        {% if form.newsletter.errors %}
+                            <div class="invalid-feedback d-block">{{ form.newsletter.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                
+                <!-- Form Errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <div><i class="fas fa-exclamation-circle"></i> {{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Navigation Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    {% if current_step > 1 %}
+                        <a href="javascript:history.back()" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    {% else %}
+                        <div></div>
+                    {% endif %}
+                    
+                    <button type="submit" class="btn btn-primary">
+                        {% if current_step == 3 %}
+                            <i class="fas fa-eye"></i> Review & Submit
+                        {% else %}
+                            Next <i class="fas fa-arrow-right"></i>
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Image preview
+    $('#profile-picture-input').on('change', function() {
+        const file = this.files[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                alert('File size must be less than 2MB');
+                this.value = '';
+                return;
+            }
+            if (!['image/jpeg', 'image/png'].includes(file.type)) {
+                alert('Only JPEG and PNG images are allowed');
+                this.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#image-preview').html(`
+                    <img src="${e.target.result}" alt="Preview" class="preview-image mt-2" style="max-width: 200px;">
+                    <div class="form-text">Preview</div>
+                `);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Gender selection - show/hide custom input
+    $('#gender-select').on('change', function() {
+        const customInput = $('#custom-gender-input');
+        if ($(this).val() === 'other') {
+            customInput.show().addClass('show');
+            customInput.attr('required', true);
+        } else {
+            customInput.hide().removeClass('show');
+            customInput.attr('required', false);
+            customInput.val('');
+        }
+    });
+
+    // Initialize gender field
+    if ($('#gender-select').val() === 'other') {
+        $('#custom-gender-input').show().addClass('show');
+    }
+
+    // Username availability check
+    let usernameTimeout;
+    $('#username-input').on('input', function() {
+        const username = $(this).val();
+        const feedback = $('#username-feedback');
+        clearTimeout(usernameTimeout);
+        
+        if (username.length < 4) {
+            feedback.text('').removeClass('available unavailable');
+            return;
+        }
+        
+        if (username.includes(' ')) {
+            feedback.html('<i class="fas fa-times text-danger"></i> Username cannot contain spaces')
+                .addClass('unavailable text-danger')
+                .removeClass('available text-success');
+            return;
+        }
+        
+        usernameTimeout = setTimeout(function() {
+            $.get('/api/check-username/', { username: username })
+                .done(function(data) {
+                    if (data.available) {
+                        feedback.html('<i class="fas fa-check text-success"></i> Username available')
+                            .addClass('available text-success')
+                            .removeClass('unavailable text-danger');
+                    } else {
+                        feedback.html('<i class="fas fa-times text-danger"></i> Username not available')
+                            .addClass('unavailable text-danger')
+                            .removeClass('available text-success');
+                    }
+                });
+        }, 500);
+    });
+
+    // Password strength meter
+    $('#new-password-input').on('input', function() {
+        const password = $(this).val();
+        const strengthBar = $('#password-strength');
+        const feedback = $('#password-feedback');
+        
+        if (!password) {
+            strengthBar.removeClass().addClass('password-strength');
+            feedback.text('');
+            return;
+        }
+
+        let strength = 0;
+        let messages = [];
+        if (password.length >= 8) strength++; else messages.push('at least 8 characters');
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++; else messages.push('1 special character');
+        if (/\d/.test(password)) strength++; else messages.push('1 number');
+
+        strengthBar.removeClass().addClass('password-strength');
+        if (strength === 1) {
+            strengthBar.addClass('strength-weak');
+            feedback.text('Weak password: missing ' + messages.join(', '));
+        } else if (strength === 2) {
+            strengthBar.addClass('strength-medium');
+            feedback.text('Medium password: missing ' + messages.join(', '));
+        } else if (strength === 3) {
+            strengthBar.addClass('strength-strong');
+            feedback.text('Strong password!');
+        }
+    });
+
+    // Show/hide company details based on profession
+    function toggleCompanyDetails() {
+        const profession = $('#profession-select').val();
+        const companyDetails = $('#company-details');
+        const companyInput = $('#company-name-input');
+        
+        if (profession === 'entrepreneur') {
+            companyDetails.slideDown();
+            companyInput.attr('required', true);
+        } else {
+            companyDetails.slideUp();
+            companyInput.attr('required', false);
+            companyInput.val('');
+        }
+    }
+    
+    $('#profession-select').on('change', toggleCompanyDetails);
+    toggleCompanyDetails(); // Initialize
+
+    // Cascading country -> state -> city
+    $('#country-select').on('change', function() {
+        const countryId = $(this).val();
+        const stateSelect = $('#state-select');
+        const citySelect = $('#city-select');
+        
+        stateSelect.html('<option value="">Select State</option>').prop('disabled', !countryId);
+        citySelect.html('<option value="">Select City</option>').prop('disabled', true);
+        
+        if (countryId) {
+            $.get('/api/states/', { country: countryId }, function(data) {
+                data.states.forEach(state => {
+                    stateSelect.append(`<option value="${state.id}">${state.name}</option>`);
+                });
+                stateSelect.prop('disabled', false);
+            });
+        }
+    });
+
+    $('#state-select').on('change', function() {
+        const stateId = $(this).val();
+        const citySelect = $('#city-select');
+        
+        citySelect.html('<option value="">Select City</option>').prop('disabled', !stateId);
+        
+        if (stateId) {
+            $.get('/api/cities/', { state: stateId }, function(data) {
+                data.cities.forEach(city => {
+                    citySelect.append(`<option value="${city.id}">${city.name}</option>`);
+                });
+                citySelect.prop('disabled', false);
+            });
+        }
+    });
+
+    // Initialize state and city dropdowns if country is already selected
+    const initialCountry = $('#country-select').val();
+    if (initialCountry) {
+        $('#country-select').trigger('change');
+    }
+});
+</script>
+{% endblock %}

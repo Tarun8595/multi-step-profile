@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Multi-Step Profile Update{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </h4>
+                <p class="mb-0 mt-2" style="opacity: 0.9;">Join us and create your professional profile</p>
+            </div>
+            <div class="card-body">
+                <form method="post" id="register-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username" required 
+                               placeholder="Choose a unique username">
+                        <div class="form-text">Must be at least 3 characters long</div>
+                    </div>
+                    
+                    <!-- <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email" required 
+                               placeholder="your.email@example.com">
+                    </div> -->
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password" required 
+                               placeholder="Create a strong password">
+                        <div id="password-strength" class="password-strength"></div>
+                        <div class="form-text">Must be at least 8 characters with numbers and special characters</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="confirm_password" class="form-label">
+                            <i class="fas fa-lock"></i> Confirm Password
+                        </label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required 
+                               placeholder="Confirm your password">
+                        <div id="password-match" class="form-text"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 btn-lg">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="mb-0">Already have an account? 
+                        <a href="{% url 'login' %}" class="text-decoration-none fw-bold">
+                            Login here <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Password strength checker
+    $('#password').on('input', function() {
+        const password = $(this).val();
+        const strengthBar = $('#password-strength');
+        
+        if (!password) {
+            strengthBar.removeClass().addClass('password-strength');
+            return;
+        }
+
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+        if (/\d/.test(password)) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+
+        strengthBar.removeClass().addClass('password-strength');
+        if (strength <= 2) {
+            strengthBar.addClass('strength-weak');
+        } else if (strength <= 3) {
+            strengthBar.addClass('strength-medium');
+        } else {
+            strengthBar.addClass('strength-strong');
+        }
+    });
+
+    // Password confirmation checker
+    $('#confirm_password').on('input', function() {
+        const password = $('#password').val();
+        const confirmPassword = $(this).val();
+        const matchDiv = $('#password-match');
+        
+        if (!confirmPassword) {
+            matchDiv.text('').removeClass();
+            return;
+        }
+        
+        if (password === confirmPassword) {
+            matchDiv.text('✓ Passwords match').addClass('text-success');
+            $(this).removeClass('is-invalid').addClass('is-valid');
+        } else {
+            matchDiv.text('✗ Passwords do not match').addClass('text-danger');
+            $(this).removeClass('is-valid').addClass('is-invalid');
+        }
+    });
+
+    // Form validation
+    $('#register-form').on('submit', function(e) {
+        const password = $('#password').val();
+        const confirmPassword = $('#confirm_password').val();
+        
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Passwords do not match!');
+            return false;
+        }
+        
+        if (password.length < 8) {
+            e.preventDefault();
+            alert('Password must be at least 8 characters long!');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

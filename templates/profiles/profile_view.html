@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load profile_extras %}
+
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-circle"></i> {{ user.username }}'s Profile
+                    </h4>
+                    <small style="opacity: 0.9;">Complete professional profile overview</small>
+                </div>
+                <div class="d-flex gap-2 mt-2 mt-md-0">
+                    <a href="{% url 'profile_update' %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
+                    <a href="{% url 'home' %}" class="btn btn-outline-light">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- Profile Picture Section -->
+                    <div class="col-lg-4">
+                        <div class="text-center">
+                            <div class="profile-picture-container mb-3">
+                                {% if profile.profile_picture %}
+                                    <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" 
+                                         class="profile-picture-large">
+                                {% else %}
+                                    <div class="profile-placeholder">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <h5 class="mb-1">{{ user.username }}</h5>
+                            <p class="text-muted mb-3">{{ profile.get_profession_display|default:"Professional" }}</p>
+                            
+                            {% if profile.company_name %}
+                                <div class="badge bg-primary mb-2">
+                                    <i class="fas fa-building"></i> {{ profile.company_name }}
+                                </div>
+                            {% endif %}
+                            
+                            {% if profile.subscription_plan %}
+                                <div class="badge bg-success mb-2">
+                                    <i class="fas fa-crown"></i> {{ profile.get_subscription_plan_display }}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock"></i> 
+                                    Last updated: {{ profile.updated_at|date:"M d, Y" }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Information -->
+                    <div class="col-lg-8">
+                        <!-- Personal Information -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-info-circle text-primary"></i> Personal Information
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="bg-light rounded p-3">
+                                        <strong class="text-muted d-block mb-1">
+                                            <i class="fas fa-user"></i> Username
+                                        </strong>
+                                        <span>{{ user.username }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bg-light rounded p-3">
+                                        <strong class="text-muted d-block mb-1">
+                                            <i class="fas fa-venus-mars"></i> Gender
+                                        </strong>
+                                        <span>
+                                            {% if profile.gender == 'other' %}
+                                                {{ profile.custom_gender|default:"Not specified" }}
+                                            {% else %}
+                                                {{ profile.get_gender_display|default:"Not specified" }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Professional Details -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-briefcase text-success"></i> Professional Details
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="bg-light rounded p-3">
+                                        <strong class="text-muted d-block mb-1">
+                                            <i class="fas fa-user-tie"></i> Profession
+                                        </strong>
+                                        <span>{{ profile.get_profession_display|default:"Not specified" }}</span>
+                                    </div>
+                                </div>
+                                {% if profile.profession == 'entrepreneur' and profile.company_name %}
+                                    <div class="col-md-6">
+                                        <div class="bg-light rounded p-3">
+                                            <strong class="text-muted d-block mb-1">
+                                                <i class="fas fa-building"></i> Company
+                                            </strong>
+                                            <span>{{ profile.company_name }}</span>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Address Information -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-map-marker-alt text-info"></i> Address Information
+                            </h5>
+                            <div class="row g-3">
+                                {% if profile.address_line1 %}
+                                    <div class="col-12">
+                                        <div class="bg-light rounded p-3">
+                                            <strong class="text-muted d-block mb-1">
+                                                <i class="fas fa-home"></i> Address
+                                            </strong>
+                                            <span>{{ profile.address_line1 }}</span>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if profile.city %}
+                                    <div class="col-md-4">
+                                        <div class="bg-light rounded p-3">
+                                            <strong class="text-muted d-block mb-1">
+                                                <i class="fas fa-city"></i> City
+                                            </strong>
+                                            <span>{{ profile.city.name }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="bg-light rounded p-3">
+                                            <strong class="text-muted d-block mb-1">
+                                                <i class="fas fa-map"></i> State
+                                            </strong>
+                                            <span>{{ profile.state.name }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="bg-light rounded p-3">
+                                            <strong class="text-muted d-block mb-1">
+                                                <i class="fas fa-globe"></i> Country
+                                            </strong>
+                                            <span>{{ profile.country.name }}</span>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="col-12">
+                                        <div class="bg-light rounded p-3 text-center">
+                                            <i class="fas fa-map-marker-alt text-muted fa-2x mb-2"></i>
+                                            <p class="text-muted mb-0">No address information provided</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Preferences -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-cog text-warning"></i> Preferences
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="bg-light rounded p-3">
+                                        <strong class="text-muted d-block mb-1">
+                                            <i class="fas fa-crown"></i> Subscription Plan
+                                        </strong>
+                                        <span>{{ profile.get_subscription_plan_display|default:"Basic" }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bg-light rounded p-3">
+                                        <strong class="text-muted d-block mb-1">
+                                            <i class="fas fa-envelope"></i> Newsletter
+                                        </strong>
+                                        <span>
+                                            {% if profile.newsletter %}
+                                                <i class="fas fa-check text-success"></i> Subscribed
+                                            {% else %}
+                                                <i class="fas fa-times text-danger"></i> Not subscribed
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Profile Completion -->
+                        <div class="mb-3">
+                            <h6 class="mb-2">Profile Completion</h6>
+                            {% with completion=profile|profile_completion %}
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ completion }}%"></div>
+                                </div>
+                                <small class="text-muted">{{ completion }}% complete</small>
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
